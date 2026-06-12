@@ -19,7 +19,7 @@
     --border-color: #283348;
     --glow: 0 0 18px rgba(43, 127, 255, 0.4);
     --essay-bg: rgba(20, 27, 43, 0.85);
-    --essay-pending: #6172a3;
+    --essay-pending: #a9b3ce;
 }
 
 :root[data-theme='light'] {
@@ -37,7 +37,7 @@
     --border-color: #dce3f0;
     --glow: 0 0 18px rgba(26, 110, 255, 0.2);
     --essay-bg: rgba(255, 255, 255, 0.94);
-    --essay-pending: #8193bb;
+    --essay-pending: #56688f;
 }
 
 body {
@@ -341,13 +341,17 @@ body::before {
     text-transform: lowercase;
 }
 
-.word-progress {
+.progress {
     width: 300px;
     height: 4px;
     background: var(--bg-elevated);
     border-radius: 4px;
     margin: 0 auto;
     overflow: hidden;
+}
+
+.progress.essay {
+    width: min(100%, 980px);
 }
 
 .essay-container {
@@ -451,11 +455,11 @@ body::before {
     padding: 20px;
     margin:0 auto 24px auto;
     border: 1px solid var(--border-color);
-    display: block;
+    display: none;
 }
 
-.word-pool.hide {
-    display: none;
+.word-pool.show {
+    display: block;
 }
 
 .pool-label {
