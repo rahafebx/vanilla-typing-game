@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>TypeEBx | Modern Typing Game</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header / Nav -->
+        <nav class="navbar">
+            <div class="logo">
+                <span class="logo-icon">
+                    <svg height="30" width="30" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496.8 496.8" xml:space="preserve">
+                        <path style="fill:transparent" d="M480 385.2c0 12.8-10.4 23.2-23.2 23.2H31.2C18.4 408.4 8 398 8 385.2V103.6c0-12.8 10.4-23.2 23.2-23.2h426.4c12.8 0 23.2 10.4 23.2 23.2v281.6z"/>
+                        <path style="fill:var(--accent-primary)" d="M460.8 96.4c6.4 0 11.2 3.2 11.2 9.6v284.8c0 6.4-4.8 9.6-11.2 9.6H35.2c-6.4 0-11.2-3.2-11.2-9.6V106c0-6.4 4.8-9.6 11.2-9.6H464m-3.2-24H35.2C16 72.4 0 86.8 0 106v284.8c0 19.2 16 33.6 35.2 33.6h426.4c19.2 0 35.2-14.4 35.2-33.6V106c-.8-19.2-16.8-33.6-36-33.6"/>
+                        <path style="fill:var(--accent-primary)" d="M420 354c-6.4 0-12-5.6-12-12V154c0-6.4 5.6-12 12-12s12 5.6 12 12v188c0 7.2-5.6 12-12 12"/>
+                        <circle style="fill:var(--text-primary)" cx="184" cy="248.4" r="45.6"/>
+                        <circle style="fill:var(--text-primary)" cx="312" cy="248.4" r="45.6"/>
+                    </svg>
+                </span>
+                <span class="logo-text">TypeEBx</span>
+            </div>
+            <div class="nav-actions">
+                <button class="theme-toggle" id="themeToggle" type="button">
+                    <span class="theme-icon icon-moon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-moon-fill" viewBox="0 0 16 16">
+                        <path d="M6 .278a.77.77 0 0 1 .08.858 7.2 7.2 0 0 0-.878 3.46c0 4.021 3.278 7.277 7.318 7.277q.792-.001 1.533-.16a.79.79 0 0 1 .81.316.73.73 0 0 1-.031.893A8.35 8.35 0 0 1 8.344 16C3.734 16 0 12.286 0 7.71 0 4.266 2.114 1.312 5.124.06A.75.75 0 0 1 6 .278"/>
+                        </svg>
+                    </span>
+                    <span class="theme-icon icon-sun">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-sun-fill" viewBox="0 0 16 16">
+                        <path d="M8 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8M8 0a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 0m0 13a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 13m8-5a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2a.5.5 0 0 1 .5.5M3 8a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2A.5.5 0 0 1 3 8m10.657-5.657a.5.5 0 0 1 0 .707l-1.414 1.415a.5.5 0 1 1-.707-.708l1.414-1.414a.5.5 0 0 1 .707 0m-9.193 9.193a.5.5 0 0 1 0 .707L3.05 13.657a.5.5 0 0 1-.707-.707l1.414-1.414a.5.5 0 0 1 .707 0m9.193 2.121a.5.5 0 0 1-.707 0l-1.414-1.414a.5.5 0 0 1 .707-.707l1.414 1.414a.5.5 0 0 1 0 .707M4.464 4.465a.5.5 0 0 1-.707 0L2.343 3.05a.5.5 0 1 1 .707-.707l1.414 1.414a.5.5 0 0 1 0 .708"/>
+                        </svg>
+                    </span>
+                    <span class="theme-context" id="themeContext">
+                        Dark mode
+                    </span>
+                </button>
+            </div>
+        </nav>
+
+        <!-- Command Bar (Ctrl/Cmd + K) -->
+        <div class="command-bar" id="commandBar">
+            <div class="command-trigger">
+                <span>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-command" viewBox="0 0 16 16">
+                    <path d="M3.5 2A1.5 1.5 0 0 1 5 3.5V5H3.5a1.5 1.5 0 1 1 0-3M6 5V3.5A2.5 2.5 0 1 0 3.5 6H5v4H3.5A2.5 2.5 0 1 0 6 12.5V11h4v1.5a2.5 2.5 0 1 0 2.5-2.5H11V6h1.5A2.5 2.5 0 1 0 10 3.5V5zm4 1v4H6V6zm1-1V3.5A1.5 1.5 0 1 1 12.5 5zm0 6h1.5a1.5 1.5 0 1 1-1.5 1.5zm-6 0v1.5A1.5 1.5 0 1 1 3.5 11z"/>
+                    </svg>
+                </span>
+                <span>ctrl/cmd + k</span>
+                <span>command line</span>
+            </div>
+        </div>
+
+        <!-- Difficulty Selector -->
+        <div class="difficulty-section">
+            <button class="difficulty-btn" data-diff="easy">EASY</button>
+            <button class="difficulty-btn active" data-diff="medium">MEDIUM</button>
+            <button class="difficulty-btn" data-diff="hard">HARD</button>
+        </div>
+
+        <!-- Game Mode Selector -->
+        <div class="mode-section">
+            <button class="mode-btn active" data-mode="essay">ESSAY</button>
+            <button class="mode-btn" data-mode="word">WORD</button>
+            <button class="mode-btn" data-mode="survival">SURVIVAL</button>
+        </div>
+
+        <div class="mode-hint" id="modeHint">Type the full paragraph exactly as shown.</div>
+
+        <!-- Stats Panel -->
+        <div class="stats-panel">
+            <div class="stat-card">
+                <div class="stat-label">SCORE</div>
+                <div class="stat-value" id="scoreValue">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">WPM</div>
+                <div class="stat-value" id="wpmValue">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">HEALTH</div>
+                <div class="stat-value" id="healthValue">100</div>
+            </div>
+        </div>
+
+        <!-- Current Word Display -->
+        <div class="word-container">
+            <div class="current-word" id="currentWord">loading...</div>
+            <div class="word-progress">
+                <div class="progress-bar" id="progressBar"></div>
+            </div>
+        </div>
+
+        <!-- Essay Display -->
+        <div class="essay-container" id="essayDisplay" aria-live="polite">
+            Lorem ipsum dolor, sit amet consectetur adipisicing elit. Consequatur ea molestias quis, a obcaecati amet debitis maiores dolor. Excepturi enim voluptatem vero maiores ad eum exercitationem magni tempora tenetur consequuntur!
+        </div>
+
+        <!-- Input Area -->
+        <div class="input-area">
+            <textarea id="userInput" class="typing-input" placeholder="Type the paragraph above..." autocomplete="off" rows="7"></textarea>
+            <div class="input-hint">essay mode highlights mistakes live</div>
+        </div>
+
+        <!-- Word Pool Preview -->
+        <div id="wordPool" class="word-pool">
+            <div class="pool-label">next words</div>
+            <div class="pool-words" id="wordPool"></div>
+        </div>
+
+        <!-- Game Controls -->
+        <div class="game-controls">
+            <button id="resetGame" class="control-btn">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-repeat" viewBox="0 0 16 16">
+                <path d="M11.534 7h3.932a.25.25 0 0 1 .192.41l-1.966 2.36a.25.25 0 0 1-.384 0l-1.966-2.36a.25.25 0 0 1 .192-.41m-11 2h3.932a.25.25 0 0 0 .192-.41L2.692 6.23a.25.25 0 0 0-.384 0L.342 8.59A.25.25 0 0 0 .534 9"/>
+                <path fill-rule="evenodd" d="M8 3c-1.552 0-2.94.707-3.857 1.818a.5.5 0 1 1-.771-.636A6.002 6.002 0 0 1 13.917 7H12.9A5 5 0 0 0 8 3M3.1 9a5.002 5.002 0 0 0 8.757 2.182.5.5 0 1 1 .771.636A6.002 6.002 0 0 1 2.083 9z"/>
+                </svg>    
+                New Game
+            </button>
+            <button id="skipWord" class="control-btn">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-right-short" viewBox="0 0 16 16">
+                <path fill-rule="evenodd" d="M4 8a.5.5 0 0 1 .5-.5h5.793L8.146 5.354a.5.5 0 1 1 .708-.708l3 3a.5.5 0 0 1 0 .708l-3 3a.5.5 0 0 1-.708-.708L10.293 8.5H4.5A.5.5 0 0 1 4 8"/>
+                </svg>
+                Skip Task (-5 health)
+            </button>
+        </div>
+
+        <!-- Game Over Modal -->
+        <div id="gameOverModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 id="gameOverTitle">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-controller" viewBox="0 0 16 16">
+                        <path d="M11.5 6.027a.5.5 0 1 1-1 0 .5.5 0 0 1 1 0m-1.5 1.5a.5.5 0 1 0 0-1 .5.5 0 0 0 0 1m2.5-.5a.5.5 0 1 1-1 0 .5.5 0 0 1 1 0m-1.5 1.5a.5.5 0 1 0 0-1 .5.5 0 0 0 0 1m-6.5-3h1v1h1v1h-1v1h-1v-1h-1v-1h1z"/>
+                        <path d="M3.051 3.26a.5.5 0 0 1 .354-.613l1.932-.518a.5.5 0 0 1 .62.39c.655-.079 1.35-.117 2.043-.117.72 0 1.443.041 2.12.126a.5.5 0 0 1 .622-.399l1.932.518a.5.5 0 0 1 .306.729q.211.136.373.297c.408.408.78 1.05 1.095 1.772.32.733.599 1.591.805 2.466s.34 1.78.364 2.606c.024.816-.059 1.602-.328 2.21a1.42 1.42 0 0 1-1.445.83c-.636-.067-1.115-.394-1.513-.773-.245-.232-.496-.526-.739-.808-.126-.148-.25-.292-.368-.423-.728-.804-1.597-1.527-3.224-1.527s-2.496.723-3.224 1.527c-.119.131-.242.275-.368.423-.243.282-.494.575-.739.808-.398.38-.877.706-1.513.773a1.42 1.42 0 0 1-1.445-.83c-.27-.608-.352-1.395-.329-2.21.024-.826.16-1.73.365-2.606.206-.875.486-1.733.805-2.466.315-.722.687-1.364 1.094-1.772a2.3 2.3 0 0 1 .433-.335l-.028-.079zm2.036.412c-.877.185-1.469.443-1.733.708-.276.276-.587.783-.885 1.465a14 14 0 0 0-.748 2.295 12.4 12.4 0 0 0-.339 2.406c-.022.755.062 1.368.243 1.776a.42.42 0 0 0 .426.24c.327-.034.61-.199.929-.502.212-.202.4-.423.615-.674.133-.156.276-.323.44-.504C4.861 9.969 5.978 9.027 8 9.027s3.139.942 3.965 1.855c.164.181.307.348.44.504.214.251.403.472.615.674.318.303.601.468.929.503a.42.42 0 0 0 .426-.241c.18-.408.265-1.02.243-1.776a12.4 12.4 0 0 0-.339-2.406 14 14 0 0 0-.748-2.295c-.298-.682-.61-1.19-.885-1.465-.264-.265-.856-.523-1.733-.708-.85-.179-1.877-.27-2.913-.27s-2.063.091-2.913.27"/>
+                        </svg>
+                        GAME OVER</h2>
+                </div>
+                <div class="modal-body">
+                    <p>Your final score: <strong id="finalScore">0</strong></p>
+                    <p>Average WPM: <strong id="finalWPM">0</strong></p>
+                    <input type="text" id="playerName" placeholder="Enter your name" maxlength="20">
+                    <div class="modal-buttons">
+                        <button id="saveScore" class="btn-primary">Save Score</button>
+                        <button id="playAgain" class="btn-secondary">Play Again</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="app.js"></script>
+</body>
+</html>

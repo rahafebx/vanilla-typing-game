@@ -1,0 +1,24 @@
+{
+  "name": "vanillia-typing-game",
+  "version": "1.0.0",
+  "description": "A beautiful, feature-rich typing game built with vanilla JavaScript, HTML, and CSS. Test your typing speed and accuracy while competing on leaderboards!",
+  "scripts": {
+    "start": "parcel src/index.html",
+    "build": "parcel build src/index.html --public-url ./"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rahafebx/vanilla-typing-game.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/rahafebx/vanilla-typing-game/issues"
+  },
+  "homepage": "https://github.com/rahafebx/vanilla-typing-game#readme",
+  "devDependencies": {
+    "parcel": "^2.16.4"
+  }
+}

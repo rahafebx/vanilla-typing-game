@@ -1,0 +1,1 @@
+export const THEME_KEY = "type-ebx-theme";
