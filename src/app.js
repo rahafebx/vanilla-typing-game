@@ -6,7 +6,7 @@ import {
 } from "./modules/api";
 import { gameState, resetState } from "./modules/states";
 import { calculateWPM } from "./modules/game";
-import { updateStatsDisplay } from "./modules/ui";
+import { updateStatsDisplay, updateLeaderboardDisplay } from "./modules/ui";
 import { saveScore } from "./modules/storage";
 
 let currentMode = "essay",
@@ -40,6 +40,9 @@ const elements = {
   playerNameInput: document.getElementById("playerName"),
   saveScore: document.getElementById("saveScore"),
   playAgain: document.getElementById("playAgain"),
+  leaderboardList: document.getElementById("leaderboardList"),
+  leaderboardFilter: document.querySelectorAll('.lb-filter'),
+  modalCloseBtns: document.querySelectorAll(".modal-close"),
 };
 
 // Initialization
@@ -59,6 +62,24 @@ async function init() {
     resetGame();
   });
 
+  document
+    .querySelector('[data-nav="leaderboard"]')
+    .addEventListener("click", showLeaderboard);
+  document
+    .querySelector('[data-nav="about"]')
+    .addEventListener("click", showAbout);
+  elements.modalCloseBtns.forEach((close) => {
+    close.addEventListener("click", closeModals);
+  });
+
+  elements.leaderboardFilter.forEach(filter => {
+        filter.addEventListener('click', () => {
+            elements.leaderboardFilter.forEach(f => f.classList.remove('active'));
+            filter.classList.add('active');
+            updateLeaderboardDisplay(filter.dataset.lb);
+        });
+    })
+
   resetGameLogic();
 }
 
@@ -71,7 +92,7 @@ function handleThemeToggle() {
 
 function handleDocumentClick(event) {
   if (!event.target.closest(".navbar")) {
-    navToggle.setAttribute("aria-expanded", "false");
+    elements.navToggle.setAttribute("aria-expanded", "false");
     nav.classList.remove("is-open");
   }
 }
@@ -80,13 +101,28 @@ function handleNavToggle() {
   const isExpanded =
     elements.navToggle.getAttribute("aria-expanded") === "true";
   if (isExpanded) {
-    navToggle.setAttribute("aria-expanded", "false");
-    nav.classList.remove("is-open");
+    elements.navToggle.setAttribute("aria-expanded", "false");
+    elements.nav.classList.remove("is-open");
     return;
   }
-  navToggle.setAttribute("aria-expanded", "true");
-  nav.classList.add("is-open");
+  elements.navToggle.setAttribute("aria-expanded", "true");
+  elements.nav.classList.add("is-open");
 }
+
+function showLeaderboard() {
+  updateLeaderboardDisplay("medium");
+  elements.leaderboardFilter.forEach((f) => f.classList.remove("active"));
+  const med = document.querySelector('[data-lb="medium"]');
+  if (med) med.classList.add("active");
+  const modal = document.getElementById("leaderboardModal");
+  if (modal) modal.classList.add("active");
+}
+
+function showAbout() {
+    const modal = document.getElementById('aboutModal');
+    if (modal) modal.classList.add('active');
+}
+
 async function loadNewContent() {
   if (currentMode === "essay") {
     elements.wordPool.classList.remove("show");

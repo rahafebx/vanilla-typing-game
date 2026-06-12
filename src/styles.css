@@ -602,8 +602,21 @@ body::before {
   border-bottom: 1px solid var(--border-color);
 }
 
-.modal-header h2 {
+.modal-header .modal-title,
+.modal-body .sub-title {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.modal-header .modal-title {
   font-size: 24px;
+  gap: 10px;
+}
+
+.modal-body .sub-title {
+  gap: 5px;
+  color: var(--accent-secondary);
 }
 
 .modal-close {
@@ -619,6 +632,56 @@ body::before {
 
 .modal-body {
   padding: 24px;
+  font-size: 14px;
+  color: var(--text-secondary);
+}
+
+.leaderboard-filters {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.lb-filter {
+  background: var(--bg-elevated);
+  border: none;
+  color: var(--text-secondary);
+  padding: 6px 16px;
+  border-radius: 20px;
+  cursor: pointer;
+  font-size: 13px;
+}
+
+.lb-filter.active {
+  background: var(--accent-primary);
+  color: white;
+}
+
+.leaderboard-list {
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.leaderboard-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.leaderboard-rank {
+  font-weight: 700;
+  color: var(--accent-primary);
+  width: 40px;
+}
+
+.leaderboard-name {
+  flex: 1;
+}
+
+.leaderboard-score {
+  font-weight: 700;
 }
 
 .modal-buttons {
