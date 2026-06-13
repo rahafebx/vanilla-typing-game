@@ -11,8 +11,8 @@
   --bg-elevated: #1e2738;
   --text-primary: #f0f3fa;
   --text-secondary: #8e9dbb;
-  --accent-primary: #2b7fff;
-  --accent-secondary: #5b9eff;
+  --accent-primary: #1e6ee5;
+  --accent-secondary: #4888e0;
   --accent-soft: rgba(42, 137, 255, 0.15);
   --accent-success: #1fcf8a;
   --accent-danger: #ff5a7a;
@@ -29,8 +29,8 @@
   --bg-elevated: #e9eef8;
   --text-primary: #121826;
   --text-secondary: #5f6f93;
-  --accent-primary: #1a6eff;
-  --accent-secondary: #4b8eff;
+  --accent-primary: #0e5fea;
+  --accent-secondary: #3775e0;
   --accent-soft: rgba(91, 167, 255, 0.14);
   --accent-success: #16c47a;
   --accent-danger: #ff4d6d;
@@ -220,7 +220,7 @@ body.health-warning {
 .theme-toggle {
   border: 1px solid var(--border-color);
   background: var(--bg-elevated);
-  color: var(--text-secondary);
+  color: var(--text-primary);
   padding: 8px;
   display: -webkit-box;
   display: -ms-flexbox;
@@ -262,7 +262,7 @@ body.health-warning {
   border-color: var(--accent-primary);
 }
 .theme-icon {
-  color: var(--text-secondary);
+  color: var(--text-primary);
 }
 .icon-moon {
   display: -webkit-box;
