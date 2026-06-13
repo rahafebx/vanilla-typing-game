@@ -242,11 +242,11 @@
 1. **Clone the repository**
 - Clone the repository:
    ```bash
-   git clone https://github.com/rahafebx/vanilla-todo-crud.git
+   git clone https://github.com/rahafebx/vanilla-typing-game.git
     ```
 - Navigate to the project directory:
     ```bash
-    cd vanilla-todo-crud
+    cd vanilla-typing-game
     ```
 - Install dependencies (if any):
     ```bash
