@@ -8,15 +8,18 @@ import { gameState, resetState } from "./modules/states";
 import { calculateWPM } from "./modules/game";
 import { updateStatsDisplay, updateLeaderboardDisplay } from "./modules/ui";
 import { saveScore } from "./modules/storage";
+import { WORDS_1K } from "./modules/words";
 
-let currentMode = "essay",
-  currentEssay = "",
-  essayProgress = 0,
-  currentWordIndex = 0,
+let currentMode = "essay", // game level
   startTime = null,
-  currentDifficulty = "medium",
   gameActive = true,
-  wordsTyped = 0;
+  currentDifficulty = "medium",
+  currentEssay = "", // essay mode
+  essayProgress = 0,
+  currentWordIndex = 0, // word mode
+  wordsTyped = 0,
+  wordsCount = 15,
+  currentWordList = [];
 
 // DOM Elements
 const elements = {
@@ -41,21 +44,25 @@ const elements = {
   saveScore: document.getElementById("saveScore"),
   playAgain: document.getElementById("playAgain"),
   leaderboardList: document.getElementById("leaderboardList"),
-  leaderboardFilter: document.querySelectorAll('.lb-filter'),
+  leaderboardFilter: document.querySelectorAll(".lb-filter"),
   modalCloseBtns: document.querySelectorAll(".modal-close"),
+  difficultyBtns: document.querySelectorAll(".difficulty-btn"),
+  modeBtns: document.querySelectorAll(".mode-btn"),
+  modeHint: document.getElementById("modeHint"),
+  inputHint: document.getElementById("inputHint"),
 };
 
 // Initialization
 async function init() {
+  disableInput();
   const initialTheme = loadTheme();
   applyTheme(initialTheme, elements.themeToggle, elements.themeContext);
   elements.themeToggle?.addEventListener("click", handleThemeToggle);
   elements.navToggle?.addEventListener("click", handleNavToggle);
   document.addEventListener("click", handleDocumentClick);
 
-  await loadNewContent();
-
   elements.userInput?.addEventListener("input", handleTyping);
+  elements.userInput?.addEventListener("keydown", handleKeyDown);
   elements.saveScore?.addEventListener("click", saveGameScore);
   elements.playAgain?.addEventListener("click", () => {
     closeModals();
@@ -72,14 +79,23 @@ async function init() {
     close.addEventListener("click", closeModals);
   });
 
-  elements.leaderboardFilter.forEach(filter => {
-        filter.addEventListener('click', () => {
-            elements.leaderboardFilter.forEach(f => f.classList.remove('active'));
-            filter.classList.add('active');
-            updateLeaderboardDisplay(filter.dataset.lb);
-        });
-    })
+  elements.leaderboardFilter.forEach((filter) => {
+    filter.addEventListener("click", () => {
+      elements.leaderboardFilter.forEach((f) => f.classList.remove("active"));
+      filter.classList.add("active");
+      updateLeaderboardDisplay(filter.dataset.lb);
+    });
+  });
 
+  elements.difficultyBtns.forEach((btn) => {
+    btn.addEventListener("click", () => setDifficulty(btn.dataset.diff));
+  });
+
+  elements.modeBtns.forEach((btn) => {
+    btn.addEventListener("click", () => setMode(btn.dataset.mode));
+  });
+
+  await loadNewContent();
   resetGameLogic();
 }
 
@@ -119,31 +135,24 @@ function showLeaderboard() {
 }
 
 function showAbout() {
-    const modal = document.getElementById('aboutModal');
-    if (modal) modal.classList.add('active');
+  const modal = document.getElementById("aboutModal");
+  if (modal) modal.classList.add("active");
 }
 
 async function loadNewContent() {
+  // essay mode
+  prepareContent();
   if (currentMode === "essay") {
-    elements.wordPool.classList.remove("show");
-
-    elements.progressBarContainer.classList.add("essay");
-    if (elements.essayDisplay) {
-      elements.essayDisplay.innerHTML =
-        '<span class="essay-char pending">Loading essay...</span>';
-    }
     currentEssay = await fetchEssayParagraph();
-    essayProgress = 0;
-    elements.currentWordDisplay.textContent = "essay task";
-    elements.userInput.classList.remove("word-mode");
-    elements.userInput.classList.add("essay-mode");
-    elements.userInput.disabled = false;
     renderEssay();
   } else {
-    elements.wordPool.classList.add("show");
-    elements.progressBarContainer.classList.remove("essay");
-    elements.userInput.classList.remove("essay-mode");
+    // word mode
+    currentWordList = await fetchRandomWords(wordsCount);
+    currentWordIndex = 0;
+    displayNextWord();
+    updateWordPool();
   }
+  enableInput();
 }
 
 function renderEssay() {
@@ -185,6 +194,15 @@ function handleTyping() {
   updateProgressBar();
 }
 
+function handleKeyDown(e) {
+  if (!gameActive) return;
+
+  if (currentMode === "word" && e.key === "Enter") {
+    e.preventDefault();
+    checkWord();
+  }
+}
+
 function updateEssayState() {
   const typed = elements.userInput.value;
   essayProgress = typed.length;
@@ -221,9 +239,9 @@ function updateEssayState() {
     finishEssay();
   }
 
-  // if (gameState.health <= 0) {
-  //     endGame();
-  // }
+  if (gameState.health <= 0) {
+    endGame();
+  }
 }
 
 function countEssayMistakes(typed, target) {
@@ -252,12 +270,11 @@ function finishEssay() {
   gameActive = false;
   showGameCompleteModal();
   // Disable input when essay is completed
-  if (elements.userInput) {
-    elements.userInput.disabled = true;
-  }
+  // disableInput();
 }
 
 function resetGameLogic() {
+  // disableInput();
   gameActive = true;
   startTime = null;
   wordsTyped = 0;
@@ -319,6 +336,7 @@ function closeModals() {
 }
 
 async function resetGame() {
+  disableInput();
   gameActive = true;
   resetState();
   gameState.difficulty = currentDifficulty;
@@ -344,7 +362,7 @@ async function resetGame() {
   if (elements.userInput) {
     elements.userInput.value = "";
     elements.userInput.disabled = false;
-    elements.userInput.focus();
+    // enableInput();
   }
 
   // Clear essay display
@@ -369,8 +387,168 @@ function updateProgressBar() {
     elements.progressBar.style.width = Math.min(ratio * 100, 100) + "%";
     return;
   }
+
+  if (!currentWordList[currentWordIndex]) return;
+  const word = currentWordList[currentWordIndex];
+  const percentage = (elements.userInput.value.length / word.length) * 100;
+  elements.progressBar.style.width = Math.min(percentage, 100) + "%";
 }
 
+function setDifficulty(difficulty) {
+  currentDifficulty = difficulty;
+  elements.difficultyBtns.forEach((btn) => {
+    btn.classList.toggle("active", btn.dataset.diff === difficulty);
+  });
+  resetGame();
+}
+
+function setMode(mode) {
+  currentMode = mode;
+  elements.modeBtns.forEach((btn) => {
+    btn.classList.toggle("active", btn.dataset.mode === mode);
+  });
+
+  if (modeHint) {
+    modeHint.textContent =
+      mode === "essay"
+        ? "Type the full paragraph exactly as shown."
+        : "Type each word and press Enter.";
+  }
+
+  if (inputHint) {
+    inputHint.textContent =
+      mode === "essay"
+        ? "essay mode highlights mistakes live."
+        : "Type each word and press Enter.";
+  }
+  resetGame();
+}
+
+function displayNextWord() {
+  if (!currentWordList[currentWordIndex]) {
+    loadNewContent();
+    return;
+  }
+
+  elements.currentWordDisplay.textContent =
+    currentWordList[currentWordIndex].toLowerCase();
+  elements.userInput.value = "";
+  updateProgressBar();
+}
+
+function updateWordPool() {
+  if (!elements.wordPool) return;
+  if (currentMode === "essay") {
+    elements.wordPool.innerHTML =
+      '<div class="pool-word essay-tag">essay mode</div><div class="pool-word next">paragraph</div>';
+    return;
+  }
+
+  elements.wordPool.innerHTML = "";
+  for (
+    let i = currentWordIndex;
+    i < Math.min(currentWordIndex + 5, currentWordList.length);
+    i++
+  ) {
+    const el = document.createElement("div");
+    el.className = "pool-word" + (i === currentWordIndex ? " next" : "");
+    el.textContent = currentWordList[i];
+    elements.wordPool.appendChild(el);
+  }
+}
+
+function checkWord() {
+  const currentWord = currentWordList[currentWordIndex];
+  const userWord = userInput.value.trim().toLowerCase();
+  const isCorrect = userWord === currentWord.toLowerCase();
+
+  if (!startTime) startTime = Date.now();
+
+  if (isCorrect) {
+    elements.userInput.classList.add("correct");
+    wordsTyped++;
+    gameState.score += getScoreIncrease(currentDifficulty);
+    gameState.health = Math.min(
+      100,
+      gameState.health + getHealthChange(currentDifficulty, true),
+    );
+  } else {
+    userInput.classList.add("wrong");
+    gameState.health = Math.max(
+      0,
+      gameState.health + getHealthChange(currentDifficulty, false),
+    );
+  }
+
+  updateStatsDisplay(
+    gameState.score,
+    gameState.health,
+    calculateWPM(startTime, wordsTyped),
+    elements.scoreEl,
+    elements.healthEl,
+    elements.wpmEl,
+  );
+
+  if (gameState.health <= 0 || currentWordIndex == wordsCount - 1) {
+    endGame();
+    return;
+  }
+
+  currentWordIndex++;
+  displayNextWord();
+  updateWordPool();
+
+  setTimeout(() => {
+    elements.userInput.classList.remove("correct", "wrong");
+  }, 200);
+}
+
+function getScoreIncrease(difficulty) {
+  return { easy: 10, hard: 30 }[difficulty] || 20;
+}
+
+function getHealthChange(difficulty, correct) {
+  if (correct) {
+    return { easy: 2, hard: 0 }[difficulty] || 1;
+  }
+  return difficulty === "hard" ? -15 : -5;
+}
+
+function prepareContent() {
+  if (currentMode === "essay") {
+    elements.wordPool.classList.remove("show");
+
+    elements.progressBarContainer.classList.add("essay");
+    elements.essayDisplay.classList.add("show");
+    if (elements.essayDisplay) {
+      elements.essayDisplay.innerHTML =
+        '<span class="essay-char pending">Loading essay...</span>';
+    }
+    essayProgress = 0;
+    elements.currentWordDisplay.textContent = "essay task";
+    elements.userInput.classList.remove("word-mode");
+    elements.userInput.classList.add("essay-mode");
+    elements.userInput.setAttribute("rows", 7);
+  } else {
+    elements.wordPool.classList.add("show");
+    elements.essayDisplay.classList.remove("show");
+    elements.progressBarContainer.classList.remove("essay");
+    elements.userInput.classList.remove("essay-mode");
+    elements.userInput.setAttribute("rows", 1);
+    elements.currentWordDisplay.textContent = "loading...";
+  }
+}
+
+function disableInput() {
+  console.log("input disabled");
+  elements.userInput.disabled = true;
+}
+
+function enableInput() {
+  elements.userInput.disabled = false;
+  if (gameActive) elements.userInput.focus();
+  console.log("input enabled");
+}
 // Start the app
 if (document.readyState === "loading") {
   document.addEventListener("DOMContentLoaded", init);

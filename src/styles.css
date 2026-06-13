@@ -406,6 +406,11 @@ body::before {
   font-size: 18px;
   color: var(--text-secondary);
   backdrop-filter: blur(12px);
+  display: none;
+}
+
+.essay-container.show {
+    display: block;
 }
 
 .essay-char {
@@ -459,8 +464,14 @@ body::before {
   text-align: left;
   transition: all 0.2s;
   resize: vertical;
-  min-height: 180px;
+  max-height: 66px;
+  min-height: 66px;
   line-height: 1.7;
+}
+
+.typing-input.essay-mode {
+  min-height: 180px !important;
+  max-height: none !important;
 }
 
 .typing-input:focus {
@@ -479,9 +490,7 @@ body::before {
   animation: shake 0.3s ease;
 }
 
-.typing-input.essay-mode {
-  border-radius: 28px;
-}
+
 
 .input-hint {
   font-size: 12px;
@@ -532,6 +541,7 @@ body::before {
 .pool-word.next {
   background: var(--accent-primary);
   color: white;
+  font-size: 18px;
 }
 
 .pool-word.essay-tag {
@@ -871,8 +881,11 @@ body::before {
   }
 
   .typing-input {
-    min-height: 200px;
     font-size: 16px;
+  }
+
+  .typing-input.essay-mode {
+    min-height: 200px !important;
   }
 }
 

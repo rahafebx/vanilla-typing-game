@@ -1,20 +1,23 @@
-import { WORD_API_URL, ESSAY_API_URL, FALLBACK_WORDS, FALLBACK_ESSAYS } from './constants';
+import { WORD_API_URL, ESSAY_API_URL } from './constants';
+import { WORDS_1K } from './words';
+import { FALLBACK_ESSAYS } from './essays';
 
 export async function fetchRandomWords(count = 15) {
     try {
         const response = await fetch(`${WORD_API_URL}&swear=0`);
         if (!response.ok) throw new Error('API request failed');
         const words = await response.json();
-        return words.slice(0, count);
+        const wordsArray = data.map(item => item.word);
+        return wordsArray;
     } catch (error) {
         console.warn('Using fallback words:', error);
         // Return random subset of fallback words
-        return getRandomFallbackWords(count);
+        return getRandomFallbackWords(WORDS_1K, count);
     }
 }
 
-function getRandomFallbackWords(count) {
-    const shuffled = [...FALLBACK_WORDS];
+function getRandomFallbackWords(wordsList, count) {
+    const shuffled = [...wordsList];
     for (let i = shuffled.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
         [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
