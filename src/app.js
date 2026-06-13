@@ -8,7 +8,7 @@ import { gameState, resetState } from "./modules/states";
 import { calculateWPM } from "./modules/game";
 import { updateStatsDisplay, updateLeaderboardDisplay } from "./modules/ui";
 import { saveScore } from "./modules/storage";
-import { WORDS_1K } from "./modules/words";
+import { BASE_WORDS } from "./modules/words";
 
 let currentMode = "essay", // game level
   startTime = null,
@@ -30,6 +30,7 @@ let currentMode = "essay", // game level
 
 // DOM Elements
 const elements = {
+  appContainer: document.getElementById('appContainer'),
   themeToggle: document.getElementById("themeToggle"),
   navToggle: document.getElementById("navToggle"),
   nav: document.getElementById("nav"),
@@ -59,6 +60,7 @@ const elements = {
   inputHint: document.getElementById("inputHint"),
   resetBtn: document.getElementById("resetGame"),
   skipBtn: document.getElementById("skipWord"),
+  commandTrigger: document.querySelector(".command-trigger"),
 };
 
 // Initialization
@@ -105,7 +107,18 @@ async function init() {
   });
 
   elements.resetBtn.addEventListener("click", resetGame);
-  elements.skipBtn.addEventListener("click", skipCurrentWord);
+  elements.skipBtn.addEventListener("click", skipCurrentTask);
+
+  elements.commandTrigger.addEventListener("click", () =>
+    elements.userInput.focus(),
+  );
+
+  document.addEventListener("keydown", (e) => {
+    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "k") {
+      e.preventDefault();
+      elements.userInput.focus();
+    }
+  });
 
   await loadNewContent();
   resetGameLogic();
@@ -144,11 +157,13 @@ function showLeaderboard() {
   if (med) med.classList.add("active");
   const modal = document.getElementById("leaderboardModal");
   if (modal) modal.classList.add("active");
+  elements.appContainer.classList.add('no-scroll');
 }
 
 function showAbout() {
   const modal = document.getElementById("aboutModal");
   if (modal) modal.classList.add("active");
+  elements.appContainer.classList.add('no-scroll');
 }
 
 async function loadNewContent() {
@@ -508,6 +523,7 @@ function closeModals() {
   document
     .querySelectorAll(".modal")
     .forEach((m) => m.classList.remove("active"));
+    elements.appContainer.classList.remove('no-scroll');
 }
 
 async function resetGame() {
@@ -608,7 +624,7 @@ function setMode(mode) {
       modeHint.textContent = "Type the full paragraph exactly as shown.";
     } else if (mode === "survival") {
       modeHint.textContent =
-        "⚠️ SURVIVAL MODE: Health decays over time! Type quickly to stay alive. Each correct word gives bonus health and increases your combo!";
+        "SURVIVAL MODE: Health decays over time! Type quickly to stay alive. Each correct word gives bonus health and increases your combo!";
     } else {
       modeHint.textContent = "Type each word and press Enter.";
     }
@@ -619,7 +635,7 @@ function setMode(mode) {
       inputHint.textContent = "essay mode highlights mistakes live.";
     } else if (mode === "survival") {
       inputHint.textContent =
-        "⚡ Type words FAST! Health decays every second. Combos give bonus points and health!";
+        "Type words FAST! Health decays every second. Combos give bonus points and health!";
     } else {
       inputHint.textContent = "Type each word and press Enter.";
     }
@@ -685,7 +701,7 @@ function updateWordPool() {
   ) {
     const remainingEl = document.createElement("div");
     remainingEl.className = "pool-word warning";
-    remainingEl.textContent = `⚠️ ${currentWordList.length - currentWordIndex} left - loading more...`;
+    remainingEl.textContent = `${currentWordList.length - currentWordIndex} left - loading more...`;
     elements.wordPool.appendChild(remainingEl);
   }
 }
@@ -701,7 +717,7 @@ function checkWord() {
     elements.userInput.classList.add("correct");
     wordsTyped++;
 
-    // Calculate score based on mode
+    // Calculate score based on mode (now 1-3 points base)
     let scoreIncrease = getScoreIncrease(currentDifficulty);
     let healthIncrease = getHealthChange(currentDifficulty, true);
 
@@ -710,10 +726,10 @@ function checkWord() {
       survivalCombo = Math.min(20, survivalCombo + 1);
       survivalLastTypedTime = Date.now();
 
-      // Combo bonus: extra score and health
+      // Combo bonus: extra score (1 point per 3 combo)
       const comboBonus = Math.floor(survivalCombo / 3);
-      scoreIncrease += comboBonus * 5;
-      healthIncrease += comboBonus;
+      scoreIncrease += comboBonus;
+      healthIncrease += Math.floor(comboBonus / 2); // Half the bonus for health
 
       // Flash combo effect
       updateComboDisplay();
@@ -742,7 +758,7 @@ function checkWord() {
 
   updateStatsDisplay(
     gameState.score,
-    gameState.health,
+    Math.round(gameState.health),
     calculateWPM(startTime, wordsTyped),
     elements.scoreEl,
     elements.healthEl,
@@ -779,7 +795,6 @@ function checkWord() {
     elements.userInput.classList.remove("correct", "wrong");
   }, 200);
 }
-
 function getScoreIncrease(difficulty) {
   const base = { easy: 10, hard: 30 }[difficulty] || 20;
   return base;
@@ -798,14 +813,40 @@ function getHealthChange(difficulty, correct) {
   return difficulty === "hard" ? -15 : -5;
 }
 
-function skipCurrentWord() {
+function skipCurrentTask() {
   if (!gameActive) return;
+
   if (currentMode === "essay") {
-    userInput.value = "";
-    updateEssayState();
+    // For essay mode, apply a health penalty and reset the essay
+    const penalty = getEssaySkipPenalty();
+    gameState.health = Math.max(0, gameState.health - penalty);
+
+    // Reset the current essay to a new one
+    loadNewEssay();
+
+    // Clear input and reset progress
+    elements.userInput.value = "";
+    essayProgress = 0;
+
+    updateStatsDisplay(
+      gameState.score,
+      gameState.health,
+      calculateWPM(
+        startTime,
+        Math.max(1, Math.floor(elements.userInput.value.length / 5)),
+      ),
+      elements.scoreEl,
+      elements.healthEl,
+      elements.wpmEl,
+    );
+
+    if (gameState.health <= 0) {
+      endGame();
+    }
     return;
   }
 
+  // For word and survival modes
   gameState.health = Math.max(0, gameState.health - 5);
 
   if (currentMode === "survival") {
@@ -817,6 +858,7 @@ function skipCurrentWord() {
     endGame();
     return;
   }
+
   currentWordIndex++;
   displayNextWord();
   updateWordPool();
@@ -828,6 +870,36 @@ function skipCurrentWord() {
     elements.healthEl,
     elements.wpmEl,
   );
+}
+
+function getEssaySkipPenalty() {
+  switch (currentDifficulty) {
+    case "easy":
+      return 15;
+    case "hard":
+      return 35;
+    default:
+      return 25;
+  }
+}
+
+async function loadNewEssay() {
+  try {
+    // Reset current essay content
+    currentEssay = await fetchEssayParagraph();
+    renderEssay();
+
+    // Reset progress
+    essayProgress = 0;
+    if (elements.userInput) {
+      elements.userInput.value = "";
+    }
+    if (elements.progressBar) {
+      elements.progressBar.style.width = "0%";
+    }
+  } catch (error) {
+    console.error("Failed to load new essay:", error);
+  }
 }
 
 function prepareContent() {
@@ -864,14 +936,12 @@ function prepareContent() {
 }
 
 function disableInput() {
-  console.log("input disabled");
   elements.userInput.disabled = true;
 }
 
 function enableInput() {
   elements.userInput.disabled = false;
   if (gameActive) elements.userInput.focus();
-  console.log("input enabled");
 }
 
 // Start the app

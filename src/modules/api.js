@@ -1,5 +1,5 @@
 import { WORD_API_URL, ESSAY_API_URL } from "./constants";
-import { WORDS_1K } from "./words";
+import { BASE_WORDS, EASY_WORD, MEDIUM_WORD, HARD_WORD } from "./words";
 import { FALLBACK_ESSAYS } from "./essays";
 
 export async function fetchRandomWords(count = 15, level = "medium") {
@@ -14,8 +14,9 @@ export async function fetchRandomWords(count = 15, level = "medium") {
     return wordsArray;
   } catch (error) {
     console.warn("Using fallback words:", error);
+    let wordLength = getLevelWordLength(level);
     // Return random subset of fallback words
-    return getRandomFallbackWords(WORDS_1K, count);
+    return getRandomFallbackWords(wordLength, count);
   }
 }
 
@@ -30,8 +31,17 @@ function getLevelWordLength(level) {
   }
 }
 
-function getRandomFallbackWords(wordsList, count) {
-  const shuffled = [...wordsList];
+function getRandomFallbackWords(wordLength, count) {
+  // const shuffled = [...wordsList];
+  let shuffled = [...BASE_WORDS];
+  if(wordLength == 5) {
+    shuffled = [...EASY_WORD];
+  } else if(wordLength == 8) {
+    shuffled = [...MEDIUM_WORD];
+  } else if(wordLength == 11){
+    shuffled = [...HARD_WORD];
+  }
+
   for (let i = shuffled.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
     [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
