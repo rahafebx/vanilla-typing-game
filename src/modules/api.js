@@ -2,18 +2,30 @@ import { WORD_API_URL, ESSAY_API_URL } from './constants';
 import { WORDS_1K } from './words';
 import { FALLBACK_ESSAYS } from './essays';
 
-export async function fetchRandomWords(count = 15) {
+export async function fetchRandomWords(count = 15, level = "medium") {
     try {
-        const response = await fetch(`${WORD_API_URL}&swear=0`);
+        let wordLength = getLevelWordLength(level);
+        const response = await fetch(`${WORD_API_URL}&words=${count}&length=${wordLength}`);
         if (!response.ok) throw new Error('API request failed');
         const words = await response.json();
-        const wordsArray = data.map(item => item.word);
+        const wordsArray = words.map(item => item.word);
         return wordsArray;
     } catch (error) {
         console.warn('Using fallback words:', error);
         // Return random subset of fallback words
         return getRandomFallbackWords(WORDS_1K, count);
     }
+}
+
+function getLevelWordLength(level) {
+    switch (level) {
+    case "easy":
+      return 5;
+    case "hard":
+      return 8;
+    default:
+      return 11;
+  }
 }
 
 function getRandomFallbackWords(wordsList, count) {

@@ -18,7 +18,7 @@ let currentMode = "essay", // game level
   essayProgress = 0,
   currentWordIndex = 0, // word mode
   wordsTyped = 0,
-  wordsCount = 15,
+  wordsCount = 30,
   currentWordList = [];
 
 // DOM Elements
@@ -50,6 +50,8 @@ const elements = {
   modeBtns: document.querySelectorAll(".mode-btn"),
   modeHint: document.getElementById("modeHint"),
   inputHint: document.getElementById("inputHint"),
+  resetBtn: document.getElementById("resetGame"),
+  skipBtn: document.getElementById("skipWord"),
 };
 
 // Initialization
@@ -94,6 +96,9 @@ async function init() {
   elements.modeBtns.forEach((btn) => {
     btn.addEventListener("click", () => setMode(btn.dataset.mode));
   });
+
+  elements.resetBtn.addEventListener("click", resetGame);
+  elements.skipBtn.addEventListener("click", skipCurrentWord);
 
   await loadNewContent();
   resetGameLogic();
@@ -147,7 +152,7 @@ async function loadNewContent() {
     renderEssay();
   } else {
     // word mode
-    currentWordList = await fetchRandomWords(wordsCount);
+    currentWordList = await fetchRandomWords(wordsCount, currentDifficulty);
     currentWordIndex = 0;
     displayNextWord();
     updateWordPool();
@@ -208,8 +213,28 @@ function updateEssayState() {
   essayProgress = typed.length;
   renderEssay();
 
-  const target = currentEssay.slice(0, typed.length);
-  const mistakes = countEssayMistakes(typed, target);
+  const target = currentEssay;
+
+  // Calculate score based on correctly typed characters
+  let correctChars = 0;
+  const maxLength = Math.min(typed.length, target.length);
+  for (let i = 0; i < maxLength; i++) {
+    if (typed[i] === target[i]) {
+      correctChars++;
+    }
+  }
+
+  // Score is the number of correctly typed characters at their correct positions
+  gameState.score = correctChars;
+
+  // Count mistakes for health penalty
+  let mistakes = 0;
+  for (let i = 0; i < maxLength; i++) {
+    if (typed[i] !== target[i]) {
+      mistakes++;
+    }
+  }
+
   const progressRatio = currentEssay.length
     ? typed.length / currentEssay.length
     : 0;
@@ -218,7 +243,6 @@ function updateEssayState() {
     startTime = Date.now();
   }
 
-  gameState.score = Math.round(progressRatio * 1000);
   gameState.health = Math.max(0, 100 - mistakes * getEssayPenalty());
   gameState.wpm = calculateWPM(
     startTime,
@@ -244,17 +268,6 @@ function updateEssayState() {
   }
 }
 
-function countEssayMistakes(typed, target) {
-  let mistakes = 0;
-  const maxLength = Math.max(typed.length, target.length);
-  for (let i = 0; i < maxLength; i++) {
-    if ((typed[i] || "") !== (target[i] || "")) {
-      mistakes++;
-    }
-  }
-  return mistakes;
-}
-
 function getEssayPenalty() {
   switch (currentDifficulty) {
     case "easy":
@@ -269,12 +282,10 @@ function getEssayPenalty() {
 function finishEssay() {
   gameActive = false;
   showGameCompleteModal();
-  // Disable input when essay is completed
-  // disableInput();
+  disableInput();
 }
 
 function resetGameLogic() {
-  // disableInput();
   gameActive = true;
   startTime = null;
   wordsTyped = 0;
@@ -332,7 +343,6 @@ function closeModals() {
   document
     .querySelectorAll(".modal")
     .forEach((m) => m.classList.remove("active"));
-  if (gameActive) elements.userInput.focus();
 }
 
 async function resetGame() {
@@ -514,7 +524,35 @@ function getHealthChange(difficulty, correct) {
   return difficulty === "hard" ? -15 : -5;
 }
 
+function skipCurrentWord() {
+  if (!gameActive) return;
+  if (currentMode === "essay") {
+    userInput.value = "";
+    updateEssayState();
+    return;
+  }
+
+  gameState.health = Math.max(0, gameState.health - 5);
+  if (gameState.health <= 0) {
+    endGame();
+    return;
+  }
+  currentWordIndex++;
+  displayNextWord();
+  updateWordPool();
+  updateStatsDisplay(
+    gameState.score,
+    gameState.health,
+    calculateWPM(startTime, wordsTyped),
+    elements.scoreEl,
+    elements.healthEl,
+    elements.wpmEl,
+  );
+}
+
 function prepareContent() {
+  userInput.classList.remove("wrong");
+  userInput.classList.remove("correct");
   if (currentMode === "essay") {
     elements.wordPool.classList.remove("show");
 
