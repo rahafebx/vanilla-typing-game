@@ -21,7 +21,7 @@
 
 </div>
 
-
+![Gameplay Screenshot](https://raw.githubusercontent.com/rahafebx/vanilla-typing-game/main/game_showcase.png)
 ## 📖 Table of Contents
 
 - [About The Project](#-about-the-project)
