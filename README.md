@@ -430,9 +430,9 @@ This project is licensed under the MIT License. See the [LICENSE](LICENSE) file 
 
 ## 📞 Contact & Support
 
-- **Project Link**: [https://github.com/yourusername/type-ebx](https://github.com/yourusername/type-ebx)
-- **Report Issues**: [GitHub Issues](https://github.com/yourusername/type-ebx/issues)
-- **Feature Requests**: [Discussions](https://github.com/yourusername/type-ebx/discussions)
+- **Project Link**: [https://github.com/rahafebx/vanilla-typing-game](https://github.com/rahafebx/vanilla-typing-game)
+- **Report Issues**: [GitHub Issues](https://github.com/rahafebx/vanilla-typing-game/issues)
+- **Feature Requests**: [Discussions](https://github.com/rahafebx/vanilla-typing-game/discussions)
 
 ---
 
