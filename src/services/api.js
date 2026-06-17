@@ -1,6 +1,6 @@
-import { WORD_API_URL, ESSAY_API_URL } from "./constants";
-import { BASE_WORDS, EASY_WORD, MEDIUM_WORD, HARD_WORD } from "./words";
-import { FALLBACK_ESSAYS } from "./essays";
+import { WORD_API_URL, ESSAY_API_URL } from "../modules/constants";
+import { BASE_WORDS, EASY_WORD, MEDIUM_WORD, HARD_WORD } from "../modules/words";
+import { FALLBACK_ESSAYS } from "../modules/essays";
 
 export async function fetchRandomWords(count = 15, level = "medium") {
   try {
@@ -15,7 +15,6 @@ export async function fetchRandomWords(count = 15, level = "medium") {
   } catch (error) {
     console.warn("Using fallback words:", error);
     let wordLength = getLevelWordLength(level);
-    // Return random subset of fallback words
     return getRandomFallbackWords(wordLength, count);
   }
 }
@@ -32,7 +31,6 @@ function getLevelWordLength(level) {
 }
 
 function getRandomFallbackWords(wordLength, count) {
-  // const shuffled = [...wordsList];
   let shuffled = [...BASE_WORDS];
   if(wordLength == 5) {
     shuffled = [...EASY_WORD];

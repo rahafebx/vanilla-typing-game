@@ -1,4 +1,4 @@
-import { THEME_KEY } from './constants'
+import { THEME_KEY } from '../modules/constants';
 
 export function loadTheme() {
     return localStorage.getItem(THEME_KEY) || getSystemTheme();
@@ -15,4 +15,10 @@ export function applyTheme(theme, themeToggle, themeContext) {
         themeToggle.setAttribute("aria-label", `Activate ${theme === "dark" ? "light" : "dark"} mode`);
         themeContext.textContent = theme === 'dark' ? 'Light mode' : 'Dark mode';
     }
+}
+
+export function handleThemeToggle() {
+  const currentTheme = loadTheme();
+  const newTheme = currentTheme === "dark" ? "light" : "dark";
+  applyTheme(newTheme, document.getElementById("themeToggle"), document.getElementById("themeContext"));
 }
