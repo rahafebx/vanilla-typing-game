@@ -6,7 +6,13 @@ import {
 } from "./modules/api";
 import { gameState, resetState } from "./modules/states";
 import { calculateWPM } from "./modules/game";
-import { updateStatsDisplay, updateLeaderboardDisplay } from "./modules/ui";
+import {
+  updateStatsDisplay,
+  updateLeaderboardDisplay,
+  disableInput,
+  enableInput,
+  escapeHtml
+} from "./modules/ui";
 import { saveScore } from "./modules/storage";
 import { BASE_WORDS } from "./modules/words";
 
@@ -30,7 +36,7 @@ let currentMode = "essay", // game level
 
 // DOM Elements
 const elements = {
-  appContainer: document.getElementById('appContainer'),
+  appContainer: document.getElementById("appContainer"),
   themeToggle: document.getElementById("themeToggle"),
   navToggle: document.getElementById("navToggle"),
   nav: document.getElementById("nav"),
@@ -65,7 +71,7 @@ const elements = {
 
 // Initialization
 async function init() {
-  disableInput();
+  disableInput(elements.userInput);
   const initialTheme = loadTheme();
   applyTheme(initialTheme, elements.themeToggle, elements.themeContext);
   elements.themeToggle?.addEventListener("click", handleThemeToggle);
@@ -157,13 +163,13 @@ function showLeaderboard() {
   if (med) med.classList.add("active");
   const modal = document.getElementById("leaderboardModal");
   if (modal) modal.classList.add("active");
-  elements.appContainer.classList.add('no-scroll');
+  elements.appContainer.classList.add("no-scroll");
 }
 
 function showAbout() {
   const modal = document.getElementById("aboutModal");
   if (modal) modal.classList.add("active");
-  elements.appContainer.classList.add('no-scroll');
+  elements.appContainer.classList.add("no-scroll");
 }
 
 async function loadNewContent() {
@@ -191,7 +197,7 @@ async function loadNewContent() {
     displayNextWord();
     updateWordPool();
   }
-  enableInput();
+  enableInput(elements.userInput, gameActive);
 }
 
 function startSurvivalMode() {
@@ -451,7 +457,7 @@ function getEssayPenalty() {
 function finishEssay() {
   gameActive = false;
   showGameCompleteModal();
-  disableInput();
+  disableInput(elements.userInput);
 }
 
 function resetGameLogic() {
@@ -489,12 +495,6 @@ function showGameCompleteModal() {
   if (elements.modal) elements.modal.classList.add("active");
 }
 
-function escapeHtml(text) {
-  const div = document.createElement("div");
-  div.textContent = text;
-  return div.innerHTML;
-}
-
 function endGame() {
   gameActive = false;
 
@@ -523,7 +523,7 @@ function closeModals() {
   document
     .querySelectorAll(".modal")
     .forEach((m) => m.classList.remove("active"));
-    elements.appContainer.classList.remove('no-scroll');
+  elements.appContainer.classList.remove("no-scroll");
 }
 
 async function resetGame() {
@@ -532,7 +532,7 @@ async function resetGame() {
     stopSurvivalMode();
   }
 
-  disableInput();
+  disableInput(elements.userInput);
   gameActive = true;
   resetState();
   gameState.difficulty = currentDifficulty;
@@ -933,15 +933,6 @@ function prepareContent() {
       elements.currentWordDisplay.classList.remove("survival-mode");
     }
   }
-}
-
-function disableInput() {
-  elements.userInput.disabled = true;
-}
-
-function enableInput() {
-  elements.userInput.disabled = false;
-  if (gameActive) elements.userInput.focus();
 }
 
 // Start the app

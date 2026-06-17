@@ -30,7 +30,7 @@ export function updateStatsDisplay(
   }
 }
 
-export function updateLeaderboardDisplay(difficulty) {
+export function updateLeaderboardDisplay(difficulty = "medium") {
   const leaderboardList = document.getElementById("leaderboardList");
   if (!leaderboardList) return;
 
@@ -55,7 +55,16 @@ export function updateLeaderboardDisplay(difficulty) {
     .join("");
 }
 
-function escapeHtml(text) {
+export function disableInput(input) {
+  input.disabled = true;
+}
+
+export function enableInput(input, isGameActive) {
+  input.disabled = false;
+  if (isGameActive) input.focus();
+}
+
+export function escapeHtml(text) {
   const div = document.createElement("div");
   div.textContent = text;
   return div.innerHTML;
