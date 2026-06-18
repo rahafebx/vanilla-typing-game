@@ -43,7 +43,6 @@
 - **Instant feedback** - Real-time visual and statistical feedback on your performance
 - **Competitive spirit** - Leaderboards to track progress and compete with others
 
-
 ## 🚀 Key Features
 
 ### 🎯 Gameplay Features
