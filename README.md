@@ -427,6 +427,11 @@ This project is licensed under the MIT License. See the [LICENSE](LICENSE) file 
 
 ---
 
+## 💡 Need Custom Modifications?
+**If you love this project and want a tailored solution, a custom WordPress theme, or a full-stack application built for your business, feel free to [Hire Me via my Portfolio](https://rahafebx.me)**.
+
+---
+
 <div align="center">
 
 **Made with ❤️ for typing enthusiasts**
@@ -438,3 +443,4 @@ This project is licensed under the MIT License. See the [LICENSE](LICENSE) file 
 [Star on GitHub](https://github.com/rahafebx/vanilla-typing-game)
 
 </div>
+
